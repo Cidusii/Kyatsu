@@ -182,3 +182,186 @@ class Command(BaseCommand):
 #            else:
 #                self.character = None
 #
+
+class CmdSetStat(Command):
+    """
+    set a stat of a character
+
+    Usage:
+     +setstat (stat) (1-200)
+
+    This sets the power of the current character. This can only be
+    used during character generation.
+    """
+
+    key = "+setstat"
+    help_category = "mush"
+
+    def parse(self):
+        "This parses the arguments"
+        args = self.args
+
+        if len(args.rsplit()) != 2:
+            self.statname = None
+            self.statvalue = None
+            return
+
+        statname = args.rsplit()[0]
+        statvalue = args.rsplit()[1]
+        self.statname = statname
+        self.statvalue = statvalue
+
+    def func(self):
+        "This performs the actual command"
+
+        allowed_statnames = self.caller.db.stats.keys()
+
+        errmsg1 = "You must supply a stat ( %s ). Syntax: +setstat (stat) (1-200)" % self.caller.db.stats.keys()
+        errmsg2 = "You must supply an integer between 1 and 200. Syntax: +setstat (stat) (1-200)"
+
+        if not self.args or not self.statname:
+            self.caller.msg(errmsg1)
+            return
+        if self.statname not in allowed_statnames:
+            self.caller.msg(errmsg1)
+            return
+        try:
+            statvalue = int(self.statvalue)
+        except ValueError:
+            self.caller.msg(errmsg2)
+            return
+        if not (1 <= statvalue <= 200):
+            self.caller.msg(errmsg2)
+            return
+        else:
+            self.caller.db.stats[self.statname] = statvalue
+            self.caller.msg("Your %s was set to %i" % (self.statname,statvalue))
+
+class CmdSetSkill(Command):
+    """
+    set a stat of a character
+
+    Usage:
+     +setskill (skillset) (skillname) (skillvalue)
+
+    This sets the power of the current character. This can only be
+    used during character generation.
+    """
+
+    key = "+setskill"
+    help_category = "mush"
+
+    def parse(self):
+        "This parses the arguments"
+        args = self.args
+
+        #Check if right number of arguments are present.
+        if len(args.rsplit()) != 3:
+            self.skillset = None
+            self.skillname = None
+            self.skillvalue = None
+            return
+
+        #Split argument line into different components
+        skillset = args.rsplit()[0]
+        skillname = args.rsplit()[1]
+        skillvalue = args.rsplit()[2]
+        self.skillset = skillset
+        self.skillname = skillname
+        self.skillvalue = skillvalue
+
+    def func(self):
+        "This performs the actual command"
+
+        #Define allowed skill sets and associated skill names
+        allowed_skillsets = ['Katanas','Dodges','Dancing']
+        allowed_skillnames = {'Katanas': ['Basics','Chop','Jab','Sword-block'], 'Dodges': ['Basics','Jump','Sidestep','Duck']}
+
+        errmsg = "Please use the correct syntax: +setskill (skillset) (skillvalue)"
+        errmsg1 = "You must supply a skillset ( %s ). Syntax: +setskill (skillset) (skillvalue)" % allowed_skillsets
+
+        if not self.args or not self.skillset:
+            self.caller.msg(errmsg)
+            return
+        if self.skillset not in allowed_skillsets:
+            self.caller.msg(errmsg1)
+            return
+
+        errmsg2 = "You must supply a skill name ( %s ). Syntax: +setskill (skillset) (skillvalue)" % allowed_skillnames[self.skillset]
+
+        if not self.skillname:
+            self.caller.msg(errmsg)
+            return
+        if self.skillname not in allowed_skillnames[self.skillset]:
+            self.caller.msg(errmsg2)
+            return
+
+        errmsg3 = "You must supply a skill value. Syntax: +setskill (skillset) (skillvalue)"
+
+        #Make sure skill value is a number, and set as an integer.
+        try:
+            skillvalue = int(self.skillvalue)
+        except ValueError:
+            self.caller.msg(errmsg3)
+            return
+
+        #Modify the skill. Not allowed to be better than the Basics skill level.
+        else:
+            if self.skillname != 'Basics' and skillvalue > self.caller.db.skills[self.skillset]['Basics']:
+                self.caller.msg("You must supply a skill value no greater than your Basics level, (Current Basics: %s)" % self.caller.db.skills[self.skillset]['Basics'])
+            else:
+                self.caller.db.skills[self.skillset][self.skillname] = skillvalue
+                self.caller.msg("Your move %s in the skill set %s was set to %i" % (self.skillset, self.skillname, skillvalue))
+
+class CmdStats(Command):
+    """
+    List stats
+
+    Usage:
+        stats
+
+    Displays a list of your current stats
+    """
+
+    key = "stats"
+    aliases = ["ss","stat"]
+    lock = "cmd:all()"
+    help_category = "General"
+
+    def func(self):
+        "implements the actual functionality"
+
+        stats, vitals = self.caller.get_stats()
+        string = "STRENGTH: %s, AGILITY: %s, SPEED: %s, DEXTERITY: %s" % (stats['str'], stats['agi'], stats['spd'], stats['dex'])
+        self.caller.msg(string)
+        string = "HP: %s / %s, Endurance: %s %%" % (vitals['current_hp'],vitals['max_hp'],vitals['current_edr']/vitals['max_edr']*100)
+        self.caller.msg(string)
+
+class CmdSkills(Command):
+    """
+    List stats
+
+    Usage:
+        stats
+
+    Displays a list of your current stats
+    """
+
+    key = "skills"
+    aliases = ["sk","skill"]
+    lock = "cmd:all()"
+    help_category = "General"
+
+    def func(self):
+        "implements the actual functionality"
+
+        skills = self.caller.get_skills()
+        for x in range(len(skills)):
+            string = "%s:" % skills.keys()[x-1]
+            self.caller.msg(string)
+            for y in range (len(skills[skills.keys()[x-1]])):
+                string = "%s: %s" % (skills[skills.keys()[x-1]].keys()[y-1], skills[skills.keys()[x-1]][skills[skills.keys()[x-1]].keys()[y-1]])
+                self.caller.msg(string)
+
+            string = ""
+            self.caller.msg(string)
