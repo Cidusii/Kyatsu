@@ -28,3 +28,50 @@ lock functions from evennia.locks.lockfuncs.
 #    """
 #    print "%s tried to access %s. Access denied." % (accessing_obj, accessed_obj)
 #    return False
+
+def cmdis_holding(accessing_obj, accessed_obj, *args, **kwargs):
+    """
+
+    Args:
+        accessing_obj:
+        accessed_obj:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+
+    return accessed_obj.obj == accessing_obj.location
+
+
+
+def cmdis_twowielding(accessing_obj, accessed_obj, *args, **kwargs):
+    """
+
+    Args:
+        accessing_obj:
+        accessed_obj:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+
+    return accessing_obj.db.right_hand['Wielding'] and accessing_obj.db.left_hand['Wielding']
+
+def cmdin_sheathe(accessing_obj, accessed_obj, *args, **kwargs):
+    """
+
+    Args:
+        accessing_obj:
+        accessed_obj:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+
+    return accessed_obj.obj == accessing_obj.location

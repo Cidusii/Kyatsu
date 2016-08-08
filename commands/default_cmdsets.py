@@ -16,7 +16,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 
 from evennia import default_cmds
 from evennia import CmdSet
-from commands import command
+from commands import command, Katana
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
     """
@@ -36,6 +36,9 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         self.add(command.CmdStats())
         self.add(command.CmdSkills())
+        self.add(command.CmdWield())
+        self.add(command.CmdUnWield())
+        self.add(command.CmdSmile())
 
 
 class PlayerCmdSet(default_cmds.PlayerCmdSet):
@@ -99,7 +102,19 @@ class ChargenCmdSet(CmdSet):
     This cmdset it used in character generation areas.
     """
     key = "Chargen"
+
     def at_cmdset_creation(self):
         "This is called at initialisation"
         self.add(command.CmdSetStat())
         self.add(command.CmdSetSkill())
+
+class KatanaCmdSet(CmdSet):
+    """
+    This cmdset is made available when a Katana is on one's person.
+    """
+    key = "HoldingKatana"
+
+    def at_cmdset_creation(self):
+
+        self.add(Katana.CmdChop())
+        self.add(Katana.CmdJab())

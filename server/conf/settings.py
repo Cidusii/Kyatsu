@@ -31,7 +31,8 @@ from evennia.settings_default import *
 # This is the name of your game. Make it catchy!
 SERVERNAME = "Kyatsu"
 
-CMDSET_UNLOGGEDIN = "contrib.menu_login.UnloggedinCmdSet"
+MULTISESSION_MODE = 0
+#CMDSET_UNLOGGEDIN = "contrib.menu_login.UnloggedinCmdSet"
 
 ######################################################################
 # Django web features

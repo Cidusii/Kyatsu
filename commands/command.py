@@ -274,7 +274,7 @@ class CmdSetSkill(Command):
         "This performs the actual command"
 
         #Define allowed skill sets and associated skill names
-        allowed_skillsets = ['Katanas','Dodges','Dancing']
+        allowed_skillsets = ['Katanas','Dodges']
         allowed_skillnames = {'Katanas': ['Basics','Chop','Jab','Sword-block'], 'Dodges': ['Basics','Jump','Sidestep','Duck']}
 
         errmsg = "Please use the correct syntax: +setskill (skillset) (skillvalue)"
@@ -365,3 +365,113 @@ class CmdSkills(Command):
 
             string = ""
             self.caller.msg(string)
+
+class CmdWield(Command):
+    #Command to wield an object.
+
+    key = "wield"
+    help_category = "mush"
+
+    def func(self):
+        caller = self.caller
+        args = self.args
+
+        if not args:
+            caller.msg("Wield what?")
+            return
+
+        obj = caller.search(args,location=caller)
+        if not obj:
+            caller.msg("You are not holding %s." % args)
+            return
+
+        if not obj.db.wieldable:
+            caller.msg("You cannot wield that you numpty!")
+            return
+        if obj.db.wieldable == "Two":
+            if not caller.db.right_hand['Wielding'] and not caller.db.left_hand['Wielding']:
+                caller.db.right_hand['Wielding'] = obj.name
+                caller.db.left_hand['Wielding'] = obj.name
+                caller.msg("You wield %s" % obj.name)
+            else:
+                caller.msg("You are already wielding something.")
+        elif obj.db.wieldable == "One":
+            if not caller.db.right_hand['Wielding']:
+                caller.db.right_hand['Wielding'] = obj.name
+                caller.msg("You wield %s." % obj.name)
+            else:
+                caller.msg("You are already wielding something in your right hand.")
+
+
+class CmdUnWield(Command):
+
+    key = "unwield"
+    aliases = "unw"
+    help_category = "mush"
+
+    def func(self):
+        caller = self.caller
+        args = self.args
+
+        if not args:
+            caller.msg("Wield what?")
+            return
+
+        obj = caller.search(args, location=caller)
+        if not obj:
+            caller.msg("You are not holding %s." % args)
+            return
+
+        if caller.db.right_hand['Wielding'] != obj.name and caller.db.left_hand['Wielding'] != obj.name:
+            self.caller.msg("You aren't wielding anything.")
+        else:
+            if self.caller.db.right_hand['Wielding'] == obj.name:
+                self.caller.db.right_hand['Wielding'] = None
+            if self.caller.db.left_hand['Wielding'] == obj.name:
+                self.caller.db.left_hand['Wielding'] = None
+            self.caller.msg("You unwield %s." % obj.name)
+
+
+class CmdSmile(Command):
+    """
+    A smile command
+
+    Usage:
+      smile [at] [<someone>]
+      grin [at] [<someone>]
+
+    Smiles to someone in your vicinity or to the room
+    in general.
+
+    (This initial string (the __doc__ string)
+    is also used to auto-generate the help
+    for this command)
+    """
+
+    key = "smile"
+    aliases = ["smile at"]
+    locks = "cmd:all()"
+    help_category = "General"
+
+    def parse(self):
+        "Very trivial parser"
+        self.target = self.args.strip()
+
+    def func(self):
+        "This actually does things"
+        caller = self.caller
+        if not self.target or self.target == "here":
+            string = "%s smiles." % caller.name
+            caller.location.msg_contents(string, exclude=caller)
+            caller.msg("You smile.")
+        else:
+            target = caller.search(self.target)
+            if not target:
+                # caller.search handles error messages
+                return
+            string = "%s smiles to you." % caller.name
+            target.msg(string)
+            string = "You smile to %s." % target.name
+            caller.msg(string)
+            string = "%s smiles to %s." % (caller.name, target.name)
+            caller.location.msg_contents(string, exclude=[caller, target])
