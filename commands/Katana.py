@@ -46,7 +46,7 @@ class CmdChop(WeaponAttacks):
             caller.msg("No target specified. (Usage: chop <target> <location>).")
             return
 
-        target = caller.search(self.target, location=caller.location, nofound_string="Your intended target, %s, cannot be found here." % args)
+        target = caller.search(self.target, location=caller.location, nofound_string="Your intended target, %s, cannot be found here." % self.target)
         hitbox = self.hitbox
 
         if not target:
@@ -113,7 +113,7 @@ class CmdJab(WeaponAttacks):
             caller.msg("No target specified. (Usage: jab <target> <location>).")
             return
 
-        target = caller.search(self.target,location=caller.location, nofound_string="Your intended target, %s, cannot be found here." % args)
+        target = caller.search(self.target,location=caller.location, nofound_string="Your intended target, %s, cannot be found here." % self.target)
         hitbox = self.hitbox
 
         if not target:
