@@ -19,6 +19,7 @@ class Weapon(Object):
         return attack_damage_mod
 
 
+
 class Katana(Weapon):
     """
     Defines the typical Katana weapon.

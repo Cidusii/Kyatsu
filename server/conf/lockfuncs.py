@@ -59,7 +59,7 @@ def cmdis_twowielding(accessing_obj, accessed_obj, *args, **kwargs):
 
     """
 
-    return accessing_obj.db.right_hand['Wielding'] and accessing_obj.db.left_hand['Wielding']
+    return (accessing_obj.db.right_hand['Wielding'] == accessed_obj.obj) and (accessing_obj.db.left_hand['Wielding'] == accessed_obj.obj)
 
 def cmdin_sheathe(accessing_obj, accessed_obj, *args, **kwargs):
     """

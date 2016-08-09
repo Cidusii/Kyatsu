@@ -8,6 +8,7 @@ Commands describe the input the player can do to the game.
 from evennia import Command as BaseCommand
 # from evennia import default_cmds
 
+from evennia import default_cmds
 
 class Command(BaseCommand):
     """
@@ -366,11 +367,11 @@ class CmdSkills(Command):
             string = ""
             self.caller.msg(string)
 
-class CmdWield(Command):
+class CmdWield(default_cmds.MuxCommand):
     #Command to wield an object.
 
     key = "wield"
-    help_category = "mush"
+    help_category = "General"
 
     def func(self):
         caller = self.caller
@@ -380,9 +381,8 @@ class CmdWield(Command):
             caller.msg("Wield what?")
             return
 
-        obj = caller.search(args,location=caller)
+        obj = caller.search(args, location=caller, nofound_string="You are not carrying %s." % args)
         if not obj:
-            caller.msg("You are not holding %s." % args)
             return
 
         if not obj.db.wieldable:
@@ -390,44 +390,43 @@ class CmdWield(Command):
             return
         if obj.db.wieldable == "Two":
             if not caller.db.right_hand['Wielding'] and not caller.db.left_hand['Wielding']:
-                caller.db.right_hand['Wielding'] = obj.name
-                caller.db.left_hand['Wielding'] = obj.name
-                caller.msg("You wield %s" % obj.name)
+                caller.db.right_hand['Wielding'] = obj
+                caller.db.left_hand['Wielding'] = obj
+                caller.msg("You wield %s." % obj.name)
             else:
                 caller.msg("You are already wielding something.")
         elif obj.db.wieldable == "One":
             if not caller.db.right_hand['Wielding']:
-                caller.db.right_hand['Wielding'] = obj.name
+                caller.db.right_hand['Wielding'] = obj
                 caller.msg("You wield %s." % obj.name)
             else:
-                caller.msg("You are already wielding something in your right hand.")
+                caller.msg("You are already wielding %s in your right hand." % caller.db.right_hand['Wielding'])
 
 
-class CmdUnWield(Command):
+class CmdUnWield(default_cmds.MuxCommand):
 
     key = "unwield"
     aliases = "unw"
-    help_category = "mush"
+    help_category = "General"
 
     def func(self):
         caller = self.caller
         args = self.args
 
         if not args:
-            caller.msg("Wield what?")
+            caller.msg("Unwield what?")
             return
 
-        obj = caller.search(args, location=caller)
+        obj = caller.search(args, location=caller, nofound_string="You are not carrying %s." % args)
         if not obj:
-            caller.msg("You are not holding %s." % args)
             return
 
-        if caller.db.right_hand['Wielding'] != obj.name and caller.db.left_hand['Wielding'] != obj.name:
+        if caller.db.right_hand['Wielding'] != obj and caller.db.left_hand['Wielding'] != obj:
             self.caller.msg("You aren't wielding anything.")
         else:
-            if self.caller.db.right_hand['Wielding'] == obj.name:
+            if self.caller.db.right_hand['Wielding'] == obj:
                 self.caller.db.right_hand['Wielding'] = None
-            if self.caller.db.left_hand['Wielding'] == obj.name:
+            if self.caller.db.left_hand['Wielding'] == obj:
                 self.caller.db.left_hand['Wielding'] = None
             self.caller.msg("You unwield %s." % obj.name)
 
@@ -451,7 +450,7 @@ class CmdSmile(Command):
     key = "smile"
     aliases = ["smile at"]
     locks = "cmd:all()"
-    help_category = "General"
+    help_category = "Emoting"
 
     def parse(self):
         "Very trivial parser"
@@ -475,3 +474,73 @@ class CmdSmile(Command):
             caller.msg(string)
             string = "%s smiles to %s." % (caller.name, target.name)
             caller.location.msg_contents(string, exclude=[caller, target])
+
+class WeaponAttacks(Command):
+
+    def parse(self):
+
+        args = self.args
+
+        if len(args.rsplit()) == 1:
+            target = args
+            hitbox = None
+        elif len(args.rsplit()) == 2:
+            target = args.rsplit()[0]
+            hitbox = args.rsplit()[1]
+        else:
+            target = None
+            hitbox = None
+
+        if not target:
+            self.target = target
+        else:
+            self.target = target.strip()
+
+        self.hitbox = hitbox
+
+    def noLongerBusy(self):
+        "This will remove busy status."
+        del self.caller.ndb.is_busy
+        self.caller.msg("You are no longer busy.")
+
+class CmdDrop(default_cmds.MuxCommand):
+    """
+    drop something
+
+    Usage:
+      drop <obj>
+
+    Lets you drop an object from your inventory into the
+    location you are currently in.
+    """
+
+    key = "drop"
+    locks = "cmd:all()"
+    arg_regex = r"\s|$"
+
+    def func(self):
+        "Implement command"
+
+        caller = self.caller
+        if not self.args:
+            caller.msg("Drop what?")
+            return
+
+        # Because the DROP command by definition looks for items
+        # in inventory, call the search function using location = caller
+        obj = caller.search(self.args, location=caller,
+                            nofound_string="You aren't carrying %s." % self.args,
+                            multimatch_string="You carry more than one %s:" % self.args)
+        if not obj:
+            return
+
+        if caller.db.left_hand['Wielding'] == obj or caller.db.right_hand['Wielding'] == obj:
+            caller.execute_cmd("unwield " + obj.name)
+
+        obj.move_to(caller.location, quiet=True)
+        caller.msg("You drop %s." % (obj.name,))
+        caller.location.msg_contents("%s drops %s." %
+                                         (caller.name, obj.name),
+                                     exclude=caller)
+        # Call the object script's at_drop() method.
+        obj.at_drop(caller)

@@ -39,6 +39,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(command.CmdWield())
         self.add(command.CmdUnWield())
         self.add(command.CmdSmile())
+        self.add(command.CmdDrop())
 
 
 class PlayerCmdSet(default_cmds.PlayerCmdSet):
