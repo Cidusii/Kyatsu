@@ -18,6 +18,12 @@ class Weapon(Object):
 
         return attack_damage_mod
 
+    def get_success_mod(self):
+
+        quality_success_mods = {"Horrible": 0.9, "Below Average": 0.95, "Average": 1, "Above Average": 1.05, "Good": 1.1, "Excellent": 1.15, "Masterful": 1.2, "Legendary": 1.25}
+
+        return quality_success_mods[self.db.quality]
+
 
 
 class Katana(Weapon):
@@ -28,6 +34,7 @@ class Katana(Weapon):
     def at_object_creation(self):
 
         #Weapon properties.
+        self.db.weapon_type = "Katanas"
         self.db.material = "Steel"
         self.db.quality = "Average"
 
@@ -57,6 +64,7 @@ class Bo(Weapon):
     def at_object_creation(self):
 
         #Weapon properties.
+        self.db.weapon_type = "Bo staves"
         self.db.material = "Oak"
         self.db.quality = "Average"
 
@@ -95,6 +103,7 @@ class Rogatina(Weapon):
     def at_object_creation(self):
 
         #Weapon properties.
+        self.db.weapon_type = "Rogatina"
         self.db.material = "Steel"
         self.db.quality = "Average"
 
