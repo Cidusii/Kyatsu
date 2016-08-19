@@ -237,6 +237,10 @@ class CmdSetStat(Command):
         else:
             self.caller.db.stats[self.statname] = statvalue
             self.caller.msg("Your %s was set to %i" % (self.statname,statvalue))
+            if self.statname == 'edr':
+                self.caller.db.vitals['max_edr'] = statvalue
+            if self.statname == 'will':
+                self.caller.db.vitals['max_hp'] = statvalue
 
 class CmdSetSkill(Command):
     """
@@ -276,7 +280,7 @@ class CmdSetSkill(Command):
 
         #Define allowed skill sets and associated skill names
         allowed_skillsets = ['Katanas','Dodges']
-        allowed_skillnames = {'Katanas': ['Basics','Chop','Jab','Sword-block'], 'Dodges': ['Basics','Jump','Sidestep','Duck']}
+        allowed_skillnames = {'Katanas': ['Basics','Chop','Jab','Upward','Downward'], 'Dodges': ['Basics','Jump','Sidestep','Duck']}
 
         errmsg = "Please use the correct syntax: +setskill (skillset) (skillvalue)"
         errmsg1 = "You must supply a skillset ( %s ). Syntax: +setskill (skillset) (skillvalue)" % allowed_skillsets
@@ -335,7 +339,7 @@ class CmdStats(Command):
         stats, vitals = self.caller.get_stats()
         string = "STRENGTH: %s, AGILITY: %s, SPEED: %s, DEXTERITY: %s" % (stats['str'], stats['agi'], stats['spd'], stats['dex'])
         self.caller.msg(string)
-        string = "HP: %s / %s, Endurance: %s %%" % (vitals['current_hp'],vitals['max_hp'],vitals['current_edr']/vitals['max_edr']*100)
+        string = "HP: %s / %s, Endurance: %s %%" % (int(vitals['current_hp']),int(vitals['max_hp']), int(vitals['current_edr']/vitals['max_edr']*100))
         self.caller.msg(string)
 
 class CmdSkills(Command):
@@ -483,7 +487,7 @@ class WeaponAttacks(Command):
 
         if len(args.rsplit()) == 1:
             target = args
-            hitbox = None
+            hitbox = "Normal"
         elif len(args.rsplit()) == 2:
             target = args.rsplit()[0]
             hitbox = args.rsplit()[1]
@@ -502,6 +506,7 @@ class WeaponAttacks(Command):
         "This will remove busy status."
         del self.caller.ndb.is_busy
         self.caller.msg("You are no longer busy.")
+
 
 class CmdDrop(default_cmds.MuxCommand):
     """

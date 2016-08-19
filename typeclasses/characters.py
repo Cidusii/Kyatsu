@@ -9,6 +9,8 @@ creation commands.
 """
 from evennia import DefaultCharacter
 
+from evennia import TICKER_HANDLER as tickerhandler
+
 class Character(DefaultCharacter):
     """
     The Character defaults to reimplementing some of base Object's hook methods with the
@@ -38,15 +40,25 @@ class Character(DefaultCharacter):
                 generation step instead.
                 """
         # set persistent stats and skills
-        self.db.stats = {'str':100, 'agi':100, 'spd':100, 'dex':100, 'will':100, 'edr':100}
 
-        self.db.vitals = {'current_hp':self.db.stats['will'],'max_hp':self.db.stats['will'],
-                          'current_edr':self.db.stats['edr'],'max_edr':self.db.stats['edr']}
+        self.db.stats = {'str': 100, 'agi': 100, 'spd': 100, 'dex': 100, 'will': 100, 'edr': 100}
+
+        self.db.vitals = {'current_hp': float(self.db.stats['will']),'max_hp': float(self.db.stats['will']),
+                          'current_edr': float(self.db.stats['edr']),'max_edr': float(self.db.stats['edr'])}
 
         self.db.skills = {'Katanas': {'Basics':50,'Jab':10,'Chop':10},'Dodges': {'Basics':50,'Duck':10,'Jump':10,'Sidestep':10}}
 
         self.db.right_hand = {'Holding': None, 'Wielding': None}
         self.db.left_hand = {'Holding': None, 'Wielding': None}
+
+        tickerhandler.add(60, self.at_tick)
+
+    def at_tick(self):
+        if self.db.vitals['current_hp'] < self.db.vitals['max_hp']:
+            self.db.vitals['current_hp'] = min(self.db.vitals['current_hp'] + 1, self.db.vitals['max_hp'])
+
+        if self.db.vitals['current_edr'] < self.db.vitals['max_edr']:
+            self.db.vitals['current_edr'] = min(self.db.vitals['current_edr'] + self.db.vitals['max_edr']/100, self.db.vitals['max_edr'])
 
     def get_stats(self):
         """
@@ -60,6 +72,13 @@ class Character(DefaultCharacter):
         """
 
         return self.db.skills
+
+    def get_strength_mod(self):
+        """
+        Returns: strength bonus to damage
+        """
+
+        return self.db.stats['str']/100
 
 
 
