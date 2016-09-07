@@ -14,9 +14,17 @@ class Weapon(Object):
         material_damage_mods = {"Wood": 0.5, "Iron": 0.75, "Steel": 1, "SuperSteel": 1.1, "Oronum": 1.2}
         quality_damage_mods = {"Horrible": 0.8, "Below Average": 0.9, "Average": 1, "Above Average": 1.1, "Good": 1.2, "Excellent": 1.3, "Masterful": 1.4, "Legendary": 1.5}
 
-        attack_damage_mod = material_damage_mods[self.db.material] * quality_damage_mods[self.db.quality]
+        if not self.db.builder_damage_mod:
+            attack_damage_mod = material_damage_mods[self.db.material] * quality_damage_mods[self.db.quality]
+        else:
+            attack_damage_mod = material_damage_mods[self.db.material] * quality_damage_mods[self.db.quality] * self.db.builder_damage_mod
 
-        return attack_damage_mod
+        if not self.db.builder_damage_bonus:
+            attack_damage_bonus = 0
+        else:
+            attack_damage_bonus = self.db.builder_damage_bonus
+
+        return attack_damage_mod, attack_damage_bonus
 
     def get_success_mod(self):
 
@@ -91,9 +99,17 @@ class Bo(Weapon):
         material_damage_mods = {"Rattan": 0.5, "Bamboo": 0.75, "Oak": 1, "Iron-banded Oak": 1.1, "Steel-banded Oak": 1.2}
         quality_damage_mods = {"Horrible": 0.8, "Below Average": 0.9, "Average": 1, "Above Average": 1.1, "Good": 1.2, "Excellent": 1.3, "Masterful": 1.4, "Legendary": 1.5}
 
-        attack_damage_mod = material_damage_mods[self.db.material] * quality_damage_mods[self.db.quality]
+        if not self.db.builder_damage_mod:
+            attack_damage_mod = material_damage_mods[self.db.material] * quality_damage_mods[self.db.quality]
+        else:
+            attack_damage_mod = material_damage_mods[self.db.material] * quality_damage_mods[self.db.quality] * self.db.builder_damage_mod
 
-        return attack_damage_mod
+        if not self.db.builder_damage_bonus:
+            attack_damage_bonus = 0
+        else:
+            attack_damage_bonus = self.db.builder_damage_bonus
+
+        return attack_damage_mod, attack_damage_bonus
 
 class Rogatina(Weapon):
     """

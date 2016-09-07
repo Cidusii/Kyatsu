@@ -5,6 +5,7 @@
 
 from collections import OrderedDict
 from random import randint
+import math
 
 # Define countering blocks to Katana attacks.
 KATANACOUNTERS = {"Jab":
@@ -16,29 +17,158 @@ KATANACOUNTERS = {"Jab":
                                {"Dodges": ["Leg dodge"], "Shields": ["Low"], "Katanas": ["Low"], "Bo staves": ["Turning"],
                                 "Rogatina": [""], "Sai": [""], "Spear": [""]},
                            "Mid":
-                               {"Dodges": [""], "Shields": [""], "Katanas": ["Downward"], "Bo staves": ["Cross"],
+                               {"Dodges": ["Turning"], "Shields": [""], "Katanas": ["Downward"], "Bo staves": ["Cross"],
                                 "Rogatina": [""], "Sai": [""], "Spear": [""]},
                            "High":
-                               {"Dodges": [""], "Shields": [""], "Katanas": ["Upward"], "Bo staves": ["Turning"],
+                               {"Dodges": ["Duck"], "Shields": [""], "Katanas": ["Upward"], "Bo staves": ["Turning"],
                                 "Rogatina": [""], "Sai": [""], "Spear": [""]},
                            }
                        },
                   "Chop":
                       {"Hitbox":
                           {"Normal":
-                               {"Dodges": ["Sidestep"], "Shields": ["Simple"], "Katanas": ["Upward"], "Bo staves": ["Upward"],
+                               {"Dodges": ["Sidestep"], "Shields": ["Simple"], "Katanas": ["Upward"], "Bo staves": ["Overhead"],
                                 "Rogatina": "", "Sai": "", "Spear": ""},
                            "Low":
-                               {"Dodges": ["Leg dodge"], "Shields": ["Low"], "Katanas": ["Low"], "Bo staves": ["Twisting"],
+                               {"Dodges": ["Back leap"], "Shields": ["Low"], "Katanas": ["Low"], "Bo staves": ["Turning"],
                                 "Rogatina": [""], "Sai": [""], "Spear": [""]},
                            "Mid":
-                               {"Dodges": [""], "Shields": [""], "Katanas": ["Upward"], "Bo staves": ["Upward"],
+                               {"Dodges": ["Sidestep"], "Shields": [""], "Katanas": ["Upward"], "Bo staves": ["Overhead"],
                                 "Rogatina": [""], "Sai": [""], "Spear": [""]},
                            "High":
-                               {"Dodges": [""], "Shields": [""], "Katanas": ["Upward"], "Bo staves": ["Upward"],
+                               {"Dodges": ["Sidestep"], "Shields": [""], "Katanas": ["Upward"], "Bo staves": ["Overhead"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           }
+                       },
+                  "Slash":
+                      {"Hitbox":
+                          {"Normal":
+                               {"Dodges": ["Swaying"], "Shields": ["Simple"], "Katanas": ["Side"], "Bo staves": ["Upward"],
+                                "Rogatina": "", "Sai": "", "Spear": ""},
+                           "Low":
+                               {"Dodges": ["Back leap"], "Shields": ["Low"], "Katanas": ["Low"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "Mid":
+                               {"Dodges": ["Swaying"], "Shields": [""], "Katanas": ["Side"], "Bo staves": ["Simple"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "High":
+                               {"Dodges": ["Swaying"], "Shields": [""], "Katanas": ["Side"], "Bo staves": ["Upward"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           }
+                       },
+                  "Side slash":
+                      {"Hitbox":
+                          {"Normal":
+                               {"Dodges": ["Simple"], "Shields": ["Cross"], "Katanas": ["Side"], "Bo staves": ["Cross"],
+                                "Rogatina": "", "Sai": "", "Spear": ""},
+                           "Low":
+                               {"Dodges": ["Jump"], "Shields": ["Cross"], "Katanas": ["Low"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "Mid":
+                               {"Dodges": ["Simple"], "Shields": ["Cross"], "Katanas": ["Side"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "High":
+                               {"Dodges": ["Duck"], "Shields": ["Cross"], "Katanas": ["Side"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           }
+                       },
+                  "Reverse slash":
+                      {"Hitbox":
+                          {"Normal":
+                               {"Dodges": ["Swaying"], "Shields": ["Turning"], "Katanas": ["Side"], "Bo staves": ["Cross"],
+                                "Rogatina": "", "Sai": "", "Spear": ""},
+                           "Low":
+                               {"Dodges": ["Back leap"], "Shields": ["Turning"], "Katanas": ["Downward"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "Mid":
+                               {"Dodges": ["Swaying"], "Shields": ["Turning"], "Katanas": ["Side"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "High":
+                               {"Dodges": ["Swaying"], "Shields": ["Turning"], "Katanas": ["Side"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           }
+                       },
+                  "Up slash":
+                      {"Hitbox":
+                          {"Normal":
+                               {"Dodges": ["Turning"], "Shields": ["Simple"], "Katanas": ["Downward"], "Bo staves": ["Simple"],
+                                "Rogatina": "", "Sai": "", "Spear": ""},
+                           "Low":
+                               {"Dodges": [""], "Shields": ["Simple"], "Katanas": [""], "Bo staves": [""],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "Mid":
+                               {"Dodges": ["Turning"], "Shields": ["Simple"], "Katanas": ["Downward"], "Bo staves": ["Simple"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "High":
+                               {"Dodges": ["Turning"], "Shields": ["Simple"], "Katanas": ["Downward"], "Bo staves": ["Simple"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           }
+                       },
+                  "Butt strike":
+                      {"Hitbox":
+                          {"Normal":
+                               {"Dodges": ["Duck"], "Shields": ["Simple"], "Katanas": ["Downward"], "Bo staves": ["Twisting"],
+                                "Rogatina": "", "Sai": "", "Spear": ""},
+                           "Low":
+                               {"Dodges": ["Leg dodge"], "Shields": ["Low"], "Katanas": ["Low"], "Bo staves": ["Turning"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "Mid":
+                               {"Dodges": ["Turning"], "Shields": ["Simple"], "Katanas": ["Downward"], "Bo staves": ["Twisting"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "High":
+                               {"Dodges": ["Duck"], "Shields": ["Simple"], "Katanas": ["Downward"], "Bo staves": ["Twisting"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           }
+                       },
+                  "Reverse thrust":
+                      {"Hitbox":
+                          {"Normal":
+                               {"Dodges": ["Turning"], "Shields": ["Turning"], "Katanas": ["Downward"], "Bo staves": ["Twisting"],
+                                "Rogatina": "", "Sai": "", "Spear": ""},
+                           "Low":
+                               {"Dodges": ["Jump"], "Shields": ["Low"], "Katanas": ["Low"], "Bo staves": ["Turning"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "Mid":
+                               {"Dodges": ["Turning"], "Shields": ["Turning"], "Katanas": ["Downward"], "Bo staves": ["Twisting"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "High":
+                               {"Dodges": ["Swaying"], "Shields": ["Turning"], "Katanas": ["Downward"], "Bo staves": ["Twisting"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           }
+                       },
+                  "Drawing slash":
+                      {"Hitbox":
+                          {"Normal":
+                               {"Dodges": ["Swaying"], "Shields": ["Turning"], "Katanas": ["Side"], "Bo staves": ["Cross"],
+                                "Rogatina": "", "Sai": "", "Spear": ""},
+                           "Low":
+                               {"Dodges": [""], "Shields": ["Turning"], "Katanas": ["Downward"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "Mid":
+                               {"Dodges": ["Swaying"], "Shields": ["Turning"], "Katanas": ["Side"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "High":
+                               {"Dodges": ["Swaying"], "Shields": ["Turning"], "Katanas": ["Side"], "Bo staves": ["Cross"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           }
+                       },
+                  "Drawing chop":
+                      {"Hitbox":
+                          {"Normal":
+                               {"Dodges": ["Turning"], "Shields": ["Overhead"], "Katanas": ["Upward"], "Bo staves": ["Upward"],
+                                "Rogatina": "", "Sai": "", "Spear": ""},
+                           "Low":
+                               {"Dodges": ["Back leap"], "Shields": ["Low"], "Katanas": ["Tsuba"], "Bo staves": ["Turning"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "Mid":
+                               {"Dodges": ["Turning"], "Shields": ["Overhead"], "Katanas": ["Upward"], "Bo staves": ["Simple"],
+                                "Rogatina": [""], "Sai": [""], "Spear": [""]},
+                           "High":
+                               {"Dodges": ["Turning"], "Shields": ["Overhead"], "Katanas": ["Upward"], "Bo staves": ["Upward"],
                                 "Rogatina": [""], "Sai": [""], "Spear": [""]},
                            }
                        }
+
 
                 }
 
@@ -232,13 +362,13 @@ def getCombatSuccess(args):
     defences = WEAPONMATCHUPS[weapon_type][attack]["Hitbox"][hitbox]
 
     # Modify success based on stats.
-    raw_success = 95 - caller.db.stats['dex']*2 - caller.db.stats['spd'] + target.db.stats['agi']*2 + target.db.stats['spd']
+    raw_success = 50 - caller.db.stats['dex']*2 - caller.db.stats['spd'] + target.db.stats['agi']*2 + target.db.stats['spd']
 
     # Define how much offensive skills benefit attacks.
     attack_success_bonus = weapon.get_success_mod() * (
     caller.db.skills[weapon_type]['Basics']*basic_attack_bonus + caller.db.skills[weapon_type][attack.title()])
 
-    raw_success -= attack_success_bonus
+    raw_success -= (attack_success_bonus + args.attack_success_bonus)
     caller.msg(raw_success)
 
     thresholds = {"Noblock Noblock": raw_success}
@@ -365,11 +495,15 @@ def getHit():
 
 def getDamage(args, raw_success, hit):
 
-    damage_mod = args.obj.get_damage_mod()
+    damage_mod, damage_bonus = args.obj.get_damage_mod()
+
+    #Determine bonus from armor on target's body part being hit.
+    armor_block_bonus = args.target.get_armor_bonus(args.hitlocation)
 
     strength_mod = args.caller.get_strength_mod()
 
-    damage = round(damage_mod*strength_mod*(hit - raw_success)/10)
+    #Damage algorithm. Needs tweaking on the fly to find balance still.
+    damage = max(0,math.ceil((args.attack_damage_mod*damage_mod*strength_mod*(hit - raw_success) + damage_bonus - armor_block_bonus)/10))
 
     return damage
 
@@ -378,3 +512,32 @@ def inflictDamage(obj, damage):
     target = obj.target
 
     target.db.vitals['current_hp'] -= damage
+
+def getDamageDesc(damage_type, damage):
+
+    if damage_type == "Pierce":
+        if damage < 5:
+            injury = "Faint wound"
+        elif damage < 10:
+            injury = "Puncture"
+        elif damage < 15:
+            injury = "Deep puncture"
+        elif damage < 20:
+            injury = "Severe puncture"
+        else:
+            injury = "Massive puncture"
+
+    elif damage_type == "Cut":
+        if damage < 5:
+            injury = "Shallow cut"
+        elif damage < 10:
+            injury = "Cut"
+        elif damage < 15:
+            injury = "Deep cut"
+        elif damage < 20:
+            injury = "Severe cut"
+        else:
+            injury = "Devastating cut"
+
+    return injury
+

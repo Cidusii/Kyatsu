@@ -8,7 +8,7 @@ Commands describe the input the player can do to the game.
 from evennia import Command as BaseCommand
 # from evennia import default_cmds
 
-from evennia import default_cmds
+from evennia import default_cmds, utils
 
 class Command(BaseCommand):
     """
@@ -268,8 +268,8 @@ class CmdSetSkill(Command):
             return
 
         #Split argument line into different components
-        skillset = args.rsplit()[0]
-        skillname = args.rsplit()[1]
+        skillset = args.rsplit()[0].title()
+        skillname = args.rsplit()[1].title()
         skillvalue = args.rsplit()[2]
         self.skillset = skillset
         self.skillname = skillname
@@ -482,6 +482,7 @@ class CmdSmile(Command):
 class WeaponAttacks(Command):
 
     def parse(self):
+        "Translates caller's attack command and splits into its components"
 
         args = self.args
 
@@ -490,7 +491,7 @@ class WeaponAttacks(Command):
             hitbox = "Normal"
         elif len(args.rsplit()) == 2:
             target = args.rsplit()[0]
-            hitbox = args.rsplit()[1]
+            hitbox = args.rsplit()[1].title()
         else:
             target = None
             hitbox = None
@@ -501,6 +502,13 @@ class WeaponAttacks(Command):
             self.target = target.strip()
 
         self.hitbox = hitbox
+
+    def makeBusy(self):
+        "This will add busy status."
+        self.caller.ndb.is_busy = True
+        self.caller.ndb.busy_timer = utils.delay(self.base_speed / (self.obj.db.attack_speed_mod *
+                                                                    self.caller.db.stats['spd'] / 100),
+                                                 callback=self.noLongerBusy)
 
     def noLongerBusy(self):
         "This will remove busy status."
