@@ -33,7 +33,7 @@ SERVERNAME = "Kyatsu"
 
 MULTISESSION_MODE = 0
 
-INSTALLED_APPS = INSTALLED_APPS + ("world.myapp", )
+#INSTALLED_APPS = INSTALLED_APPS + ("world.myapp", )
 #CMDSET_UNLOGGEDIN = "contrib.menu_login.UnloggedinCmdSet"
 
 ######################################################################
