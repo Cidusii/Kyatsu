@@ -51,6 +51,28 @@ class Character(DefaultCharacter):
         self.db.right_hand = {'Holding': None, 'Wielding': None}
         self.db.left_hand = {'Holding': None, 'Wielding': None}
 
+        #Define clothes dictionaries for characters. Layer 1 = underclothes, layer 2 = clothes, layers 3+ are armor.
+        #Append is for stuff like medals etc which people can wear.
+        self.db.clothes = {"Head": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Face": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Neck": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Left shoulder": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Right shoulder": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Chest": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Back": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Left arm": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Right arm": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Left hand": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Right hand": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Stomach": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Waist": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Left thigh": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Right thigh": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Left calf": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Right calf": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Left foot": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None},
+                           "Right foot": {"Layer 1": None, "Layer 2": None, "Layer 3": None, "Layer 4": None, "Layer 5": None, "Append": None}}
+
         tickerhandler.add(60, self.at_tick)
 
     def at_tick(self):
@@ -79,6 +101,23 @@ class Character(DefaultCharacter):
         """
 
         return self.db.stats['str']/100
+
+    def get_armor_bonus(self, hitlocation):
+        """
+        Returns: armor bonus for a hit location.
+        """
+
+        armor_bonus = 0
+
+        #Sums the armor bonus for each layer of clothing that the person is wearing.
+        for layer in self.db.clothes[hitlocation]:
+            if not self.db.clothes[hitlocation][layer]:
+                pass
+            else:
+                armor = self.db.clothes[hitlocation][layer]
+                armor_bonus += armor.db.armor_bonus
+
+        return armor_bonus
 
 
 
